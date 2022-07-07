@@ -1,0 +1,38 @@
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  namespace: default
+  name: traefik
+  labels:
+    app: traefik
+spec:
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      containers:
+        - name: traefik
+          image: traefik:v2.6
+          imagePullPolicy: IfNotPresent
+          args:
+            - --api=true
+            - --api.dashboard=true
+            - --entrypoints.web.address=:80
+            - --entrypoints.websecure.address=:443
+            - --log.level=DEBUG
+            # - --certificatesresolvers.leresolver.acme.httpchallenge=true
+            # - --certificatesresolvers.leresolver.acme.email=gustavo+ssl@qesh.ai
+            # - --certificatesresolvers.leresolver.acme.storage=./acme.json
+            # - --certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web
+            - --providers.kubernetescrd.allowCrossNamespace
+          ports:
+            - name: web
+              containerPort: 80
+            - name: websecure
+              containerPort: 443

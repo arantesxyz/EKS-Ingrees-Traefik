@@ -34,18 +34,10 @@ resource "aws_iam_role_policy_attachment" "demo-cluster-AmazonEKSServicePolicy" 
   role       = aws_iam_role.demo-cluster.name
 }
 
-#resource "aws_vpc" "test" {
-#  cidr_block  = "172.31.0.0/16"
-#  id          = "vpc-02ed9faedd87bd655"
-#
-#}
-
-
 resource "aws_security_group" "demo-cluster" {
   name        = "terraform-eks-demo-cluster"
   description = "Cluster communication with worker nodes"
-  vpc_id      = var.vpc_id     # = aws_vpc.demo.id
-
+  vpc_id      = aws_vpc.demo.id
 
   egress {
     from_port   = 0
@@ -59,20 +51,14 @@ resource "aws_security_group" "demo-cluster" {
   }
 }
 
-#resource "aws_instance" "awscli" {
-#
-#  provisioner "local-exec" {
-#    command = "echo ${aws_instance.awscli.private_ip}
-#  }
-#}
-
 resource "aws_security_group_rule" "demo-cluster-ingress-workstation-https" {
-  cidr_blocks       = ["100.25.153.58/32"]  #"${aws_instance.awscli.private_ip.result}" # =  [local.workstation-external-cidr]
+  # cidr_blocks       = [local.workstation-external-cidr]
+  cidr_blocks       = ["0.0.0.0/0"]
   description       = "Allow workstation to communicate with the cluster API Server"
   from_port         = 443
-  to_port           = 443
   protocol          = "tcp"
   security_group_id = aws_security_group.demo-cluster.id
+  to_port           = 443
   type              = "ingress"
 }
 
@@ -82,12 +68,7 @@ resource "aws_eks_cluster" "demo" {
 
   vpc_config {
     security_group_ids = [aws_security_group.demo-cluster.id]
-    vpc_id             = var.vpc_id
-    subnet_ids         = [
-      var.subnet_a,
-      var.subnet_b
-    ]
-     # = aws_subnet.demo[*].id
+    subnet_ids         = aws_subnet.demo[*].id
   }
 
   depends_on = [
