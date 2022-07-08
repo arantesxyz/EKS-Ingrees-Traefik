@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: acme-issuer
+spec:
+  acme:
+    # Configure your email here...
+    # ---
+    email: gustavo+ssl@qesh.ai
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # server: https://acme-staging-v02.api.letsencrypt.org/directory
+
+    privateKeySecretRef:
+      name: acme-clusterissuer-priv-key
+    solvers:
+    - dns01:
+        cloudflare:
+          email: gustavo@qesh.ai
+          apiTokenSecretRef:
+            name: cloudflare-api-key-secret-2
+            key: api-token

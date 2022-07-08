@@ -1,0 +1,11 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: pudimdevcert
+spec:
+  secretName: pudimdevcert
+  dnsNames:
+    - pudim.dev.qesh.ai
+  issuerRef:
+    name: acme-issuer
+    kind: ClusterIssuer
